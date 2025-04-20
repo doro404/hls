@@ -18,7 +18,7 @@ define('PROOT', '');
 
 define('HLS_API_SECRET_KEY', '12345');
 
-$allowed_domains = ['workplace.codyseller.com','localhost'];
+$allowed_domains = ['saikaplay.site','localhost', 'animesonlinebr.fun'];
 
 define('ALLOWED_DOMAINS', $allowed_domains);
 
