@@ -36,6 +36,11 @@ COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 # Ativa reescrita de URLs, se necessário
 RUN a2enmod rewrite
 
+
+# Configura permissões
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 775 /var/www/html
+
 # Expondo a porta padrão do Apache
 EXPOSE 80
 
