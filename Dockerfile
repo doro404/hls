@@ -29,7 +29,8 @@ COPY . .
 RUN composer install --no-dev --prefer-dist
 
 # Configura o Nginx
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf  # Adicione seu arquivo de configuração do Nginx
+COPY docker/000-default.conf /etc/nginx/sites-available/default
+
 
 # Expondo a porta 80 para o Nginx
 EXPOSE 80
