@@ -1,6 +1,12 @@
-FROM php:7.4-cli
+FROM php:7.4-apache
 
-# Instala FFmpeg e dependências básicas
+# Copia os arquivos do projeto para o diretório padrão do Apache
+COPY . /var/www/html/
+
+# Configura permissões
+RUN chown -R www-data:www-data /var/www/html
+
+# Instala dependências básicas e bibliotecas necessárias
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     git \
@@ -9,10 +15,9 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libpng-dev \
     libjpeg-dev \
-    libfreetype6-dev \
-    nginx  # Instala o servidor web Nginx
+    libfreetype6-dev
 
-# Instala extensões PHP necessárias
+# Instala extensões PHP
 RUN docker-php-ext-configure zip \
     && docker-php-ext-install zip gd
 
@@ -20,20 +25,19 @@ RUN docker-php-ext-configure zip \
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Define o diretório da aplicação
-WORKDIR /app
+WORKDIR /var/www/html
 
-# Copia os arquivos do projeto para dentro do container
-COPY . .
-
-# Instala as dependências do projeto via Composer
+# Instala dependências PHP via Composer
 RUN composer install --no-dev --prefer-dist
 
-# Configura o Nginx
-COPY docker/000-default.conf /etc/nginx/sites-available/default
+# Substitui o arquivo de configuração do Apache (000-default.conf)
+COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 
+# Ativa reescrita de URLs, se necessário
+RUN a2enmod rewrite
 
-# Expondo a porta 80 para o Nginx
+# Expondo a porta padrão do Apache
 EXPOSE 80
 
-# Comando para rodar o Nginx (não executar o PHP automaticamente)
-CMD service nginx start && tail -f /dev/null
+# Inicia o Apache em modo foreground
+CMD ["apache2-foreground"]
